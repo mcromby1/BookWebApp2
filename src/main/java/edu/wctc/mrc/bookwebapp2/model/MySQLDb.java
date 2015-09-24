@@ -16,7 +16,7 @@ import java.util.Map;
  *
  * @author Matthew Cromby
  */
-public class MySQLDb {
+public class MySQLDb implements DBAccessorPlan {
 
     private Connection conn;
 
@@ -29,6 +29,7 @@ public class MySQLDb {
      * @throws ClassNotFoundException
      * @throws SQLException
      */
+    @Override
     public void openConnection(String driverClass, String url, String userName, String password) throws ClassNotFoundException, SQLException {
         Class.forName(driverClass);
         conn = DriverManager.getConnection(url, userName, password);
@@ -38,6 +39,7 @@ public class MySQLDb {
      *
      * @throws SQLException
      */
+    @Override
     public void closeConnection() throws SQLException {
         conn.close();
     }
@@ -50,6 +52,7 @@ public class MySQLDb {
      * @return
      * @throws SQLException
      */
+    @Override
     public int deleteRecord(String tableName, String columnName, Object value) throws SQLException {
         String sql;
         if (value instanceof String) {
@@ -71,6 +74,7 @@ public class MySQLDb {
      * @return
      * @throws SQLException
      */
+    @Override
     public int deleteByPK(String tableName, String primaryKeyFieldName, Object primaryKeyValue) throws SQLException {
         String sql = "DELETE FROM " + tableName + "WHERE " + primaryKeyFieldName + " = ";
         if (primaryKeyValue instanceof String) {
@@ -93,6 +97,7 @@ public class MySQLDb {
      * @return
      * @throws SQLException
      */
+    @Override
     public int deleteByPKPS(String tableName, String primaryKeyFieldName, Object primaryKeyValue) throws SQLException {
         String sql = "DELETE FROM " + tableName + "WHERE " + primaryKeyFieldName + " = ?";
 
@@ -114,6 +119,7 @@ public class MySQLDb {
      * @return
      * @throws SQLException
      */
+    @Override
     public int updateRecord(String tableName, String columnName, String whereColName, Object colValue, Object whereValue) throws SQLException {
         PreparedStatement pstmt = createUpdateStatement(tableName, columnName, whereColName);
 
@@ -135,6 +141,7 @@ public class MySQLDb {
     private PreparedStatement createUpdateStatement(String tableName, String columnName, String whereColName) throws SQLException {
         String sql = "Update " + tableName + " Set " + columnName + " = ? Where " + whereColName + " = ?";
         PreparedStatement pstmt = conn.prepareStatement(sql);
+        System.out.println(sql);
         return pstmt;
     }
 
@@ -146,6 +153,7 @@ public class MySQLDb {
      * @return
      * @throws SQLException
      */
+    @Override
     public int insertRecord(String tableName, List columnName, List colValue) throws SQLException {
         PreparedStatement pstmt = createInsertStatement(tableName, columnName);
 
@@ -195,6 +203,7 @@ public class MySQLDb {
      * @return
      * @throws SQLException
      */
+    @Override
     public List<Map<String, Object>> findAllRecords(String tableName) throws SQLException {
         List<Map<String, Object>> records = new ArrayList<>();
         String sql = "Select * From " + tableName;

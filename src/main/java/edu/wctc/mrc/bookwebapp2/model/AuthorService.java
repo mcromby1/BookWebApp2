@@ -11,7 +11,11 @@ public class AuthorService {
 
     private AuthorDAO aDAO;
 
-    public List<Author> getAllAuthors() throws SQLException {
+    public AuthorService(AuthorDAO aDAO) {
+        this.aDAO = aDAO;
+    }
+
+    public List<Author> getAllAuthors() throws SQLException, ClassNotFoundException {
         return aDAO.findAllAuthors();
     }
 

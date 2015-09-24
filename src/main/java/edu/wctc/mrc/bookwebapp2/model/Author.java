@@ -9,18 +9,24 @@ import java.util.Date;
 public class Author {
 
     private int authorId;
-    private String name;
+    private String authorName;
     private Date date;
 
     public Author() {
     }
 
-    public Author(String name) {
-        this.name = name;
+    public Author(String authorName) {
+        this.authorName = authorName;
     }
 
-    public Author(String name, Date date) {
-        this.name = name;
+    public Author(String authorName, Date date) {
+        this.authorName = authorName;
+        this.date = date;
+    }
+
+    public Author(int authorId, String authorName, Date date) {
+        this.authorId = authorId;
+        this.authorName = authorName;
         this.date = date;
     }
 
@@ -32,12 +38,12 @@ public class Author {
         this.authorId = authorId;
     }
 
-    public String getName() {
-        return name;
+    public String getAuthorName() {
+        return authorName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setName(String authorName) {
+        this.authorName = authorName;
     }
 
     public Date getDate() {

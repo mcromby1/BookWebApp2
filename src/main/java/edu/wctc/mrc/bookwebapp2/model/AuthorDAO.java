@@ -9,10 +9,23 @@ import java.util.*;
  */
 public class AuthorDAO {
 
-    private MySQLDb dataBase;
+    private DBAccessorPlan dataBase;
+    private String driverClass;
+    private String url;
+    private String userName;
+    private String password;
 
-    public List<Author> findAllAuthors() throws SQLException {
-        List<Map<String, Object>> results = new ArrayList<>();
+    public AuthorDAO(DBAccessorPlan db, String driverClass, String url, String userName, String password) {
+        this.dataBase = db;
+        this.driverClass = driverClass;
+        this.url = url;
+        this.userName = userName;
+        this.password = password;
+    }
+
+    public List<Author> findAllAuthors() throws SQLException, ClassNotFoundException {
+        dataBase.openConnection(driverClass, url, userName, password);
+        List<Map<String, Object>> results;
         List<Author> authors = new ArrayList<>();
 
         results = dataBase.findAllRecords("author");
@@ -30,6 +43,7 @@ public class AuthorDAO {
             author.setDate(dateAdded);
             authors.add(author);
         }
+        dataBase.closeConnection();
         return authors;
     }
 
