@@ -10,7 +10,7 @@ public class Author {
 
     private int authorId;
     private String authorName;
-    private Date date;
+    private Date dateCreated;
 
     public Author() {
     }
@@ -21,13 +21,13 @@ public class Author {
 
     public Author(String authorName, Date date) {
         this.authorName = authorName;
-        this.date = date;
+        this.dateCreated = date;
     }
 
     public Author(int authorId, String authorName, Date date) {
         this.authorId = authorId;
         this.authorName = authorName;
-        this.date = date;
+        this.dateCreated = date;
     }
 
     public int getAuthorId() {
@@ -42,16 +42,16 @@ public class Author {
         return authorName;
     }
 
-    public void setName(String authorName) {
+    public void setAuthorName(String authorName) {
         this.authorName = authorName;
     }
 
-    public Date getDate() {
-        return date;
+    public Date getDateCreated() {
+        return dateCreated;
     }
 
-    public void setDate(Date date) {
-        this.date = date;
+    public void setDateCreated(Date date) {
+        this.dateCreated = date;
     }
 
 }

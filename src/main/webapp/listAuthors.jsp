@@ -15,10 +15,12 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <link href="css/bootstrap.css" rel="stylesheet" type="text/css"/>
         <title>Author List</title>
     </head>
-    <body>
+    <body class="col-lg-5 col-md-5 col-sm-5 col-xs-6">
         <h1>Author List</h1>
+        <a class="btn btn-info" role="button" href="AuthorController?action=add">Add Author</a>
         <table width="500" border="1" cellspacing="0" cellpadding="4">
             <tr style="background-color: black;color:white;">
                 <th align="left" class="tableHead">ID</th>
@@ -37,9 +39,13 @@
                     <td align="left">${a.authorId}</td>
                     <td align="left">${a.authorName}</td>
                     <td align="right">
-                        <fmt:formatDate pattern="M/d/yyyy" value="${a.date}"></fmt:formatDate>
+                        <fmt:formatDate pattern="M/d/yyyy" value="${a.dateCreated}"></fmt:formatDate>
                         </td>
-                    </tr>
+                        <td>
+                            <p><a class="btn btn-danger" role="button" href="AuthorController?action=delete&authorId=${a.authorId}" name="authorId" value="${a.authorId}">Delete</a> 
+                            <a class="btn btn-success" role="button" href="AuthorController?action=update">Update</a>
+                    </td>
+                </tr>
             </c:forEach>
         </table>
         <c:if test="${errMsg != null}">

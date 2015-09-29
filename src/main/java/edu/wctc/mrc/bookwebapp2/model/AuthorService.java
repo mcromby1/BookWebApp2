@@ -19,4 +19,12 @@ public class AuthorService {
         return aDAO.findAllAuthors();
     }
 
+    public void deleteAuthor(int pk) throws SQLException, ClassNotFoundException {
+        aDAO.deleteAuthor(pk);
+    }
+    
+    public static void main(String[] args) {
+        
+    }
+
 }

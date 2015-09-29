@@ -6,6 +6,7 @@ import edu.wctc.mrc.bookwebapp2.model.AuthorService;
 import edu.wctc.mrc.bookwebapp2.model.DBAccessorPlan;
 import edu.wctc.mrc.bookwebapp2.model.MySQLDb;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.List;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -74,9 +75,7 @@ public class AuthorController extends HttpServlet {
              Parameter
              */
             if (action.equals(LIST_ACTION)) {
-                List<Author> authors = null;
-                authors = authService.getAllAuthors();
-                request.setAttribute("authors", authors);
+                refreshList(request, response, authService);
                 destination = LIST_PAGE;
 
             } else if (action.equals(ADD_ACTION)) {
@@ -84,7 +83,11 @@ public class AuthorController extends HttpServlet {
             } else if (action.equals(UPDATE_ACTION)) {
                 // coming soon
             } else if (action.equals(DELETE_ACTION)) {
-                // coming soon
+                String pk = request.getParameter("authorId");
+                authService.deleteAuthor(Integer.parseInt(pk));
+
+                refreshList(request, response, authService);
+                destination = LIST_PAGE;
             } else {
                 // no param identified in request, must be an error
                 request.setAttribute("errMsg", NO_PARAM_ERR_MSG);
@@ -92,6 +95,7 @@ public class AuthorController extends HttpServlet {
             }
 
         } catch (Exception e) {
+
             request.setAttribute("errMsg", e.getCause().getMessage());
         }
 
@@ -99,6 +103,12 @@ public class AuthorController extends HttpServlet {
         RequestDispatcher dispatcher
                 = getServletContext().getRequestDispatcher(destination);
         dispatcher.forward(request, response);
+    }
+
+    private void refreshList(HttpServletRequest request, HttpServletResponse response, AuthorService authService) throws SQLException, ClassNotFoundException {
+        List<Author> authors;
+        authors = authService.getAllAuthors();
+        request.setAttribute("authors", authors);
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

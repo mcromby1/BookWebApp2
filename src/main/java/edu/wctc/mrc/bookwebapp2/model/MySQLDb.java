@@ -63,7 +63,10 @@ public class MySQLDb implements DBAccessorPlan {
         Statement stmt = conn.createStatement();
         int count = stmt.executeUpdate(sql);
 //        System.out.println(count);
+        closeConnection();
+
         return count;
+
     }
 
     /**
@@ -76,7 +79,7 @@ public class MySQLDb implements DBAccessorPlan {
      */
     @Override
     public int deleteByPK(String tableName, String primaryKeyFieldName, Object primaryKeyValue) throws SQLException {
-        String sql = "DELETE FROM " + tableName + "WHERE " + primaryKeyFieldName + " = ";
+        String sql = "DELETE FROM " + tableName + " WHERE " + primaryKeyFieldName + " = ";
         if (primaryKeyValue instanceof String) {
             sql += "'" + primaryKeyValue.toString() + "'";
         } else {
@@ -86,6 +89,7 @@ public class MySQLDb implements DBAccessorPlan {
         Statement stmt = conn.createStatement();
 
         int recordsDeleted = stmt.executeUpdate(sql);
+        closeConnection();
         return recordsDeleted;
     }
 
@@ -99,13 +103,14 @@ public class MySQLDb implements DBAccessorPlan {
      */
     @Override
     public int deleteByPKPS(String tableName, String primaryKeyFieldName, Object primaryKeyValue) throws SQLException {
-        String sql = "DELETE FROM " + tableName + "WHERE " + primaryKeyFieldName + " = ?";
+        String sql = "DELETE FROM " + tableName + " WHERE " + primaryKeyFieldName + " = ?";
 
         PreparedStatement pstmt = conn.prepareStatement(sql);
 
         pstmt.setObject(1, primaryKeyValue);
 
         int recordsDeleted = pstmt.executeUpdate();
+        closeConnection();
         return recordsDeleted;
     }
 
@@ -128,6 +133,7 @@ public class MySQLDb implements DBAccessorPlan {
 
         System.out.println(pstmt.toString());
         int updateCount = pstmt.executeUpdate();
+        closeConnection();
         return updateCount;
     }
 
@@ -163,6 +169,7 @@ public class MySQLDb implements DBAccessorPlan {
         }
 
         int updateCount = pstmt.executeUpdate();
+        closeConnection();
         return updateCount;
     }
 
@@ -219,9 +226,15 @@ public class MySQLDb implements DBAccessorPlan {
             }
             records.add(record);
         }
+        closeConnection();
         return records;
     }
 
+    /**
+     *
+     * @param args
+     * @throws Exception
+     */
     public static void main(String[] args) throws Exception {
         String driverClassName = "com.mysql.jdbc.Driver";
         String url = "jdbc:mysql://localhost:3306/book";
