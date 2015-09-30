@@ -41,7 +41,7 @@ public class AuthorDAO {
             author.setDateCreated(dateAdded);
             authors.add(author);
         }
-
+        dataBase.closeConnection();
         return authors;
     }
 

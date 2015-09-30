@@ -18,7 +18,7 @@
         <link href="css/bootstrap.css" rel="stylesheet" type="text/css"/>
         <title>Author List</title>
     </head>
-    <body class="col-lg-5 col-md-5 col-sm-5 col-xs-6">
+    <body class="col-xs-offset-1 col-lg-5 col-md-5 col-sm-5 col-xs-6">
         <h1>Author List</h1>
         <a class="btn btn-info" role="button" href="AuthorController?action=add">Add Author</a>
         <table width="500" border="1" cellspacing="0" cellpadding="4">
@@ -42,8 +42,8 @@
                         <fmt:formatDate pattern="M/d/yyyy" value="${a.dateCreated}"></fmt:formatDate>
                         </td>
                         <td>
-                            <p><a class="btn btn-danger" role="button" href="AuthorController?action=delete&authorId=${a.authorId}" name="authorId" value="${a.authorId}">Delete</a> 
-                            <a class="btn btn-success" role="button" href="AuthorController?action=update">Update</a>
+                            <p><a class="btn btn-danger" role="button" href="AuthorController?action=delete&authorId=${a.authorId}">Delete</a> 
+                            <a class="btn btn-success" role="button" href="AuthorController?action=update&authorId=${a.authorId}">Update</a>
                     </td>
                 </tr>
             </c:forEach>
