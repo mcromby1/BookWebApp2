@@ -1,26 +1,29 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package edu.wctc.mrc.bookwebapp2.model;
 
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import javax.activation.DataSource;
 
 /**
  *
  * @author user test
  */
-public class AuthorDAO implements AuthorDAOPlan {
+public class ConnPoolAuthorDAO implements AuthorDAOPlan {
 
     private final DBAccessorPlan dataBase;
-    private final String driverClass;
-    private final String url;
-    private final String userName;
-    private final String password;
+    private final DataSource dataSource;
 
-    public AuthorDAO(DBAccessorPlan db, String driverClass, String url, String userName, String password) {
+    public ConnPoolAuthorDAO(DataSource ds, DBAccessorPlan db) {
         this.dataBase = db;
-        this.driverClass = driverClass;
-        this.url = url;
-        this.userName = userName;
-        this.password = password;
+        this.dataSource = ds;
     }
 
     @Override

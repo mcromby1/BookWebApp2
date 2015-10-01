@@ -41,8 +41,8 @@
                             </div>
                             </tr>
                             <c:choose>
-                                <c:when test="${author.authorId >= 0}">
-                                    <button class="btn-default" type="submit" id="submit" name="submit" value="update">Submit</button>
+                                <c:when test="${not empty author}">
+                                    <button class="btn-default" type="submit" id="create" name="submit" value="update">Submit</button>
                                 </c:when>
                                 <c:otherwise>
                                     <button class="btn-default" type="submit" id="submit" name="submit" value="create">Submit</button>

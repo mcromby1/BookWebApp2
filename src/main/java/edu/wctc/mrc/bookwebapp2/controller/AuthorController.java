@@ -1,12 +1,15 @@
 package edu.wctc.mrc.bookwebapp2.controller;
 
 import edu.wctc.mrc.bookwebapp2.model.Author;
-import edu.wctc.mrc.bookwebapp2.model.AuthorDAO;
+import edu.wctc.mrc.bookwebapp2.model.*;
 import edu.wctc.mrc.bookwebapp2.model.AuthorService;
 import edu.wctc.mrc.bookwebapp2.model.DBAccessorPlan;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
+import javax.activation.DataSource;
+import javax.naming.Context;
+import javax.naming.InitialContext;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -71,22 +74,21 @@ public class AuthorController extends HttpServlet {
                     = new AuthorDAO(db, dbDriver,
                             dbURL, dbUserName, dbPassword);
             AuthorService authService = new AuthorService(authDao);
-
             try {
                 /*
                  Here's what the connection pool version looks like.
                  */
-//            Context ctx = new InitialContext();
-//            DataSource ds = (DataSource)ctx.lookup("jdbc/book");
-//            AuthorDaoStrategy authDao = new ConnPoolAuthorDao(ds, new MySqlDbStrategy());
-//            AuthorService authService = new AuthorService(authDao);
+//                Context ctx = new InitialContext();
+//                DataSource ds = (DataSource) ctx.lookup("jdbc/book");
+//                AuthorDAOPlan authDao = new ConnPoolAuthorDao(ds, new MySQLDb());
+//                AuthorService authService = new AuthorService(authDao);
                 /*
                  Determine what action to take based on a passed in QueryString
                  Parameter
                  */
                 switch (action) {
                     case LIST_ACTION:
-                        refreshList(request, response, authService);
+                        refreshList(request, authService);
                         destination = LIST_PAGE;
                         break;
                     case ADD_ACTION:
@@ -99,7 +101,7 @@ public class AuthorController extends HttpServlet {
                     case DELETE_ACTION:
                         String pk = request.getParameter("authorId");
                         authService.deleteAuthor(Integer.parseInt(pk));
-                        refreshList(request, response, authService);
+                        refreshList(request, authService);
                         destination = LIST_PAGE;
                         break;
                     case CREATE_ACTION:
@@ -125,7 +127,7 @@ public class AuthorController extends HttpServlet {
         }
     }
 
-    private void refreshList(HttpServletRequest request, HttpServletResponse response, AuthorService authService) throws SQLException, ClassNotFoundException {
+    private void refreshList(HttpServletRequest request, AuthorService authService) throws SQLException, ClassNotFoundException {
         List<Author> authors;
         authors = authService.getAllAuthors();
         request.setAttribute("authors", authors);
