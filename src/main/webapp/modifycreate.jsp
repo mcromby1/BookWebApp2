@@ -21,10 +21,10 @@
                 <div class="panel-heading"><h1>Author Form</h1></div>
                 <div class="panel-body">
                     <table>
-                        <form role="form" class="form-horizontal" id="authorForm" name="authorForm" method="POST" action="calcmain" value="Circle">
+                        <form role="form" class="form-horizontal" id="authorForm" name="authorForm" method="POST" action="AuthorController">
                             <tr>
                             <div class="form-group">
-                                <td>ID></td>
+                                <td>ID</td>
                                 <td>${author.authorId}</td>
                             </div>
                             </tr>
@@ -47,11 +47,12 @@
                                 <c:otherwise>
                                     <button class="btn-default" type="submit" id="submit" name="submit" value="create">Submit</button>
                                 </c:otherwise>
-                            </form>
-                        </table>
-                    </div>
+                            </c:choose>
+                        </form>
+                    </table>
                 </div>
             </div>
+        </div>
 
-        </body>
-    </html>
+    </body>
+</html>
