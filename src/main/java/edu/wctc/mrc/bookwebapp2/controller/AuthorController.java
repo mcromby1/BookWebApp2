@@ -6,6 +6,7 @@ import edu.wctc.mrc.bookwebapp2.model.AuthorService;
 import edu.wctc.mrc.bookwebapp2.model.DBAccessorPlan;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import javax.activation.DataSource;
 import javax.naming.Context;
@@ -35,6 +36,7 @@ public class AuthorController extends HttpServlet {
     private static final String UPDATE_ACTION = "update";
     private static final String DELETE_ACTION = "delete";
     private static final String ACTION_PARAM = "action";
+    private static final String MODIFY_ACTION = "modify";
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -86,26 +88,61 @@ public class AuthorController extends HttpServlet {
                  Determine what action to take based on a passed in QueryString
                  Parameter
                  */
+                String pk = null;
+                String authorName = null;
+                String createDate = null;
                 switch (action) {
                     case LIST_ACTION:
                         refreshList(request, authService);
                         destination = LIST_PAGE;
                         break;
                     case ADD_ACTION:
-                        Author author = new Author();
-                        request.setAttribute("author", author);
                         destination = MOD_CREATE_PAGE;
                         break;
                     case UPDATE_ACTION:
+                        pk = request.getParameter("authorId");
+                        authorName = request.getParameter("authorName");
+                        createDate = request.getParameter("dateCreated");
+
+                        if (!(authorName.isEmpty())) {
+                            authService.updateAuthor("author_name", "author_id", authorName, pk);
+                        }
+                        if (!(createDate.isEmpty())) {
+                            authService.updateAuthor("date_created", "author_id", createDate, pk);
+                        }
+                        refreshList(request, authService);
+                        destination = LIST_PAGE;
                         break;
                     case DELETE_ACTION:
-                        String pk = request.getParameter("authorId");
+                        pk = request.getParameter("authorId");
                         authService.deleteAuthor(Integer.parseInt(pk));
                         refreshList(request, authService);
                         destination = LIST_PAGE;
                         break;
                     case CREATE_ACTION:
+                        authorName = request.getParameter("authorName");
+                        createDate = request.getParameter("dateCreated");
+
+                        List<String> columns = new ArrayList<>();
+                        List<String> colValues = new ArrayList<>();
+                        columns.add("author_name");
+                        colValues.add(authorName);
+                        columns.add("date_created");
+                        colValues.add(createDate);
+
+                        authService.addAuthor(columns, colValues);
+
+                        refreshList(request, authService);
+                        destination = LIST_PAGE;
                         break;
+                    case MODIFY_ACTION:
+                        pk = request.getParameter("authorId");
+                        Author modAuthor = authService.searchAuthorByID(pk);
+
+                        request.setAttribute("author", modAuthor);
+                        destination = MOD_CREATE_PAGE;
+                        break;
+
                     default:
                         // no param identified in request, must be an error
                         request.setAttribute("errMsg", NO_PARAM_ERR_MSG);
