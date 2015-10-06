@@ -81,9 +81,7 @@ public class AuthorController extends HttpServlet {
                      a connection pool to improve this.
                      */
 //        DBAccessorPlan db = new MySQLDb();
-                    AuthorDAO authDao
-                            = new AuthorDAO(db, dbDriver,
-                                    dbURL, dbUserName, dbPassword);
+                    AuthorDAO authDao = new AuthorDAO(db, dbDriver, dbURL, dbUserName, dbPassword);
                     authService = new AuthorService(authDao);
                 }
 
