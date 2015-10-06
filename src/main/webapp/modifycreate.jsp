@@ -6,6 +6,7 @@
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -25,13 +26,13 @@
                             <tr>
                             <div class="form-group">
                                 <td>ID</td>
-                                <td>${author.authorId}</td>
+                                <td align="left"><input type="text" value="${author.authorId}" name="authorId" readonly/></td>
                             </div>
                             </tr>
                             <tr>
                             <div class="form-group">
                                 <td><label for="authorId">Author Name</label></td>
-                                <td><input class="form-control" type="text" id="authorId" name="authorId" value="" placeholder="${author.authorName}"/></td>
+                                <td align="left"><input type="text" value="" name="authorName" placeholder="${author.authorName}"/></td>
                             </div>
                             </tr>
                             <tr>
@@ -42,17 +43,17 @@
                             </tr>
                             <c:choose>
                                 <c:when test="${not empty author}">
-                                    <button class="btn-default" type="submit" id="create" name="submit" value="update">Submit</button>
+                                    <button class="btn-default" type="submit" id="create" name="action" value="update">Submit</button>
                                 </c:when>
                                 <c:otherwise>
-                                    <button class="btn-default" type="submit" id="submit" name="submit" value="create">Submit</button>
+                                    <button class="btn-default" type="submit" id="submit" name="action" value="create">Submit</button>
                                 </c:otherwise>
                             </c:choose>
                         </form>
-                    </table>
+                    </table>    
                 </div>
             </div>
         </div>
-
+        <a class="btn btn-success" role="button" href="AuthorController?action=list">Back to List</a>
     </body>
 </html>

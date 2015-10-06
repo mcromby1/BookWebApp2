@@ -145,7 +145,7 @@ public class MySQLDb implements DBAccessorPlan {
      * @throws SQLException
      */
     private PreparedStatement createUpdateStatement(String tableName, String columnName, String whereColName) throws SQLException {
-        String sql = "Update " + tableName + " Set " + columnName + " = ? Where " + whereColName + " = ?";
+        String sql = "Update " + tableName + " Set " + columnName + " = ? Where " + whereColName + " = ?;";
         PreparedStatement pstmt = conn.prepareStatement(sql);
         System.out.println(sql);
         return pstmt;
@@ -183,20 +183,19 @@ public class MySQLDb implements DBAccessorPlan {
     private PreparedStatement createInsertStatement(String tableName, List columnName) throws SQLException {
         StringBuffer sql = new StringBuffer("Insert Into " + tableName + " (");
         if (columnName.size() > 1) {
-            for (Object cn : columnName) {
-                sql.append(cn).append(", ");
+            for (int i = 0; i < (columnName.size() - 1); i++) {
+                sql.append(columnName.get(i)).append(", ");
             }
-        } else {
-            sql.append(columnName.get(0));
         }
+        sql.append(columnName.get(columnName.size() - 1));
+
         sql.append(") Values (");
         if (columnName.size() > 1) {
-            for (Object columnName1 : columnName) {
+            for (int i = 0; i < (columnName.size() - 1); i++) {
                 sql.append("?, ");
             }
-        } else {
-            sql.append("?");
         }
+        sql.append("?");
         sql.append(");");
 
         System.out.println(sql);
@@ -228,6 +227,27 @@ public class MySQLDb implements DBAccessorPlan {
         }
         closeConnection();
         return records;
+    }
+
+    @Override
+    public Map<String, Object> findRecordByPK(String tableName, String columnName, String pk) throws SQLException {
+        Map<String, Object> record = new HashMap<>();
+        String sql = "Select * From " + tableName + " Where " + columnName + " = ?";
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        stmt.setObject(1, pk);
+        ResultSet rs = stmt.executeQuery();
+        ResultSetMetaData metaData = rs.getMetaData();
+        int columnCount = metaData.getColumnCount();
+        System.out.println(columnCount);
+        while (rs.next()) {
+            for (int i = 1; i <= columnCount; i++) {
+                record.put(metaData.getColumnName(i), rs.getObject(i));
+            }
+        }
+
+        closeConnection();
+        return record;
+
     }
 
     /**

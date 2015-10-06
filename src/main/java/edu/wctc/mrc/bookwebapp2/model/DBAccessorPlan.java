@@ -87,4 +87,14 @@ public interface DBAccessorPlan {
      */
     int updateRecord(String tableName, String columnName, String whereColName, Object colValue, Object whereValue) throws SQLException;
 
+    /**
+     *
+     * @param tableName
+     * @param columnName
+     * @param pk
+     * @return
+     * @throws SQLException
+     */
+    public Map<String, Object> findRecordByPK(String tableName, String columnName, String pk) throws SQLException;
+
 }

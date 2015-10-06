@@ -16,7 +16,7 @@ import javax.activation.DataSource;
  *
  * @author user test
  */
-public class ConnPoolAuthorDAO implements AuthorDAOPlan {
+public class ConnPoolAuthorDAO /* implements AuthorDAOPlan */ {
 
     private final DBAccessorPlan dataBase;
     private final DataSource dataSource;
@@ -26,9 +26,9 @@ public class ConnPoolAuthorDAO implements AuthorDAOPlan {
         this.dataSource = ds;
     }
 
-    @Override
+//    @Override
     public List<Author> findAllAuthors() throws SQLException, ClassNotFoundException {
-        dataBase.openConnection(driverClass, url, userName, password);
+//        dataBase.openConnection(driverClass, url, userName, password);
         List<Map<String, Object>> results;
         List<Author> authors = new ArrayList<>();
 
@@ -49,9 +49,9 @@ public class ConnPoolAuthorDAO implements AuthorDAOPlan {
         return authors;
     }
 
-    @Override
+//    @Override
     public int deleteAuthor(int pk) throws SQLException, ClassNotFoundException {
-        dataBase.openConnection(driverClass, url, userName, password);
+//        dataBase.openConnection(driverClass, url, userName, password);
         int recordDeleted = dataBase.deleteByPKPS("author", "author_id", pk);
         dataBase.closeConnection();
         return recordDeleted;

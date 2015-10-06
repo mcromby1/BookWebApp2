@@ -54,4 +54,45 @@ public class AuthorDAO implements AuthorDAOPlan {
         return recordDeleted;
     }
 
+    @Override
+    public void createNewAuthor(List columns, List values) throws SQLException, ClassNotFoundException {
+        dataBase.openConnection(driverClass, url, userName, password);
+
+        dataBase.insertRecord("author", columns, values);
+        dataBase.closeConnection();
+
+    }
+
+    @Override
+    public void updateAuthor(List columns, List values) throws SQLException, ClassNotFoundException {
+        dataBase.openConnection(driverClass, url, userName, password);
+        dataBase.updateRecord(userName, userName, userName, values, userName);
+        dataBase.closeConnection();
+    }
+
+    @Override
+    public Author authorByPK(String pk) throws SQLException, ClassNotFoundException {
+        dataBase.openConnection(driverClass, url, userName, password);
+        Map<String, Object> record
+                = dataBase.findRecordByPK("author", "author_id", pk);
+
+        Author author = new Author();
+        Object obj = record.get("author_id");
+        author.setAuthorId(Integer.parseInt(obj.toString()));
+        String name = record.get("author_name") == null ? "" : record.get("author_name").toString();
+        author.setAuthorName(name);
+        obj = record.get("date_added");
+        Date dateAdded = (obj == null) ? new Date() : (Date) record.get("date_added");
+        author.setDateCreated(dateAdded);
+
+        dataBase.closeConnection();
+        return author;
+    }
+
+    @Override
+    public void updateAuthor(String columnName, String whereColName, Object colValue, Object whereValue) throws SQLException, ClassNotFoundException {
+        dataBase.openConnection(driverClass, url, userName, password);
+        dataBase.updateRecord("author", columnName, whereColName, colValue, whereValue);
+    }
+
 }

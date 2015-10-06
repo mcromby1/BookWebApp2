@@ -9,7 +9,7 @@ import java.util.List;
  */
 public class AuthorService {
 
-    private AuthorDAO aDAO;
+    private final AuthorDAOPlan aDAO;
 
     public AuthorService(AuthorDAO aDAO) {
         this.aDAO = aDAO;
@@ -22,9 +22,21 @@ public class AuthorService {
     public void deleteAuthor(int pk) throws SQLException, ClassNotFoundException {
         aDAO.deleteAuthor(pk);
     }
-    
+
+    public void addAuthor(List columns, List values) throws SQLException, ClassNotFoundException {
+        aDAO.createNewAuthor(columns, values);
+    }
+
+    public Author searchAuthorByID(String pk) throws SQLException, ClassNotFoundException {
+        return aDAO.authorByPK(pk);
+    }
+
+    public void updateAuthor(String columnName, String whereColName, Object colValue, Object whereValue) throws SQLException, ClassNotFoundException {
+        aDAO.updateAuthor(columnName, whereColName, colValue, whereValue);
+    }
+
     public static void main(String[] args) {
-        
+
     }
 
 }

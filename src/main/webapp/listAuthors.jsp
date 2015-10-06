@@ -43,7 +43,7 @@
                         </td>
                         <td>
                             <p><a class="btn btn-danger" role="button" href="AuthorController?action=delete&authorId=${a.authorId}">Delete</a> 
-                            <a class="btn btn-success" role="button" href="AuthorController?action=update&authorId=${a.authorId}">Update</a>
+                            <a class="btn btn-success" role="button" href="AuthorController?action=modify&authorId=${a.authorId}">Update</a>
                     </td>
                 </tr>
             </c:forEach>
