@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.sql.DataSource;
 
 /**
  *
@@ -33,6 +34,10 @@ public class MySQLDb implements DBAccessorPlan {
     public void openConnection(String driverClass, String url, String userName, String password) throws ClassNotFoundException, SQLException {
         Class.forName(driverClass);
         conn = DriverManager.getConnection(url, userName, password);
+    }
+
+    public void openConnection(DataSource ds) throws Exception {
+        conn = ds.getConnection();
     }
 
     /**

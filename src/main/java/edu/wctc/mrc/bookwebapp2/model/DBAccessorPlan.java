@@ -3,6 +3,7 @@ package edu.wctc.mrc.bookwebapp2.model;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
+import javax.sql.DataSource;
 
 /**
  *
@@ -14,7 +15,9 @@ public interface DBAccessorPlan {
      *
      * @throws SQLException
      */
-    void closeConnection() throws SQLException;
+    public void closeConnection() throws SQLException;
+
+    public void openConnection(DataSource ds) throws Exception;
 
     /**
      *

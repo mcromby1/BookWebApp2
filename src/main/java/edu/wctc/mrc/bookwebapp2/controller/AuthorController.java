@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import javax.activation.DataSource;
+import javax.sql.DataSource;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.servlet.RequestDispatcher;
@@ -52,38 +52,45 @@ public class AuthorController extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
 
         try {
+            String destination = LIST_PAGE;
+            String action = request.getParameter(ACTION_PARAM);
             String dbClassName = this.getServletContext().getInitParameter("DBAccessorPlan");
             Class c = Class.forName(dbClassName);
             DBAccessorPlan db = (DBAccessorPlan) c.newInstance();
+            AuthorService authService = null;
 
-            String dbDriver = this.getServletContext().getInitParameter("dbDriver");
-            String dbURL = this.getServletContext().getInitParameter("dbURL");
-            String dbUserName = this.getServletContext().getInitParameter("dbUserName");
-            String dbPassword = this.getServletContext().getInitParameter("dbPassword");
-
-            String destination = LIST_PAGE;
-            String action = request.getParameter(ACTION_PARAM);
-
-            /*
-             For now we are hard-coding the strategy objects into this
-             controller. In the future we'll auto inject them from a config
-             file. Also, the DAO opens/closes a connection on each method call,
-             which is not very efficient. In the future we'll learn how to use
-             a connection pool to improve this.
-             */
-//        DBAccessorPlan db = new MySQLDb();
-            AuthorDAO authDao
-                    = new AuthorDAO(db, dbDriver,
-                            dbURL, dbUserName, dbPassword);
-            AuthorService authService = new AuthorService(authDao);
+            String dataSourceParam = this.getServletContext().getInitParameter("dataSource");
             try {
+                if (!(dataSourceParam.isEmpty())) {
+                    Context ctx = new InitialContext();
+                    DataSource ds = (DataSource) ctx.lookup(dataSourceParam);
+                    AuthorDAOPlan authDao = new AuthorDAO(new MySQLDb(), ds);
+                    authService = new AuthorService(authDao);
+                } else {
+
+                    String dbDriver = this.getServletContext().getInitParameter("dbDriver");
+                    String dbURL = this.getServletContext().getInitParameter("dbURL");
+                    String dbUserName = this.getServletContext().getInitParameter("dbUserName");
+                    String dbPassword = this.getServletContext().getInitParameter("dbPassword");
+
+                    /*
+                     For now we are hard-coding the strategy objects into this
+                     controller. In the future we'll auto inject them from a config
+                     file. Also, the DAO opens/closes a connection on each method call,
+                     which is not very efficient. In the future we'll learn how to use
+                     a connection pool to improve this.
+                     */
+//        DBAccessorPlan db = new MySQLDb();
+                    AuthorDAO authDao
+                            = new AuthorDAO(db, dbDriver,
+                                    dbURL, dbUserName, dbPassword);
+                    authService = new AuthorService(authDao);
+                }
+
                 /*
                  Here's what the connection pool version looks like.
                  */
-//                Context ctx = new InitialContext();
-//                DataSource ds = (DataSource) ctx.lookup("jdbc/book");
-//                AuthorDAOPlan authDao = new ConnPoolAuthorDao(ds, new MySQLDb());
-//                AuthorService authService = new AuthorService(authDao);
+
                 /*
                  Determine what action to take based on a passed in QueryString
                  Parameter
@@ -149,12 +156,11 @@ public class AuthorController extends HttpServlet {
                         destination = LIST_PAGE;
                         break;
                 }
-
             } catch (SQLException | ClassNotFoundException | NumberFormatException e) {
-
+                request.setAttribute("errMsg", e.getCause().getMessage());
+            } catch (Exception e) {
                 request.setAttribute("errMsg", e.getCause().getMessage());
             }
-
             // Forward to destination page
             RequestDispatcher dispatcher
                     = getServletContext().getRequestDispatcher(destination);
@@ -164,7 +170,7 @@ public class AuthorController extends HttpServlet {
         }
     }
 
-    private void refreshList(HttpServletRequest request, AuthorService authService) throws SQLException, ClassNotFoundException {
+    private void refreshList(HttpServletRequest request, AuthorService authService) throws SQLException, ClassNotFoundException, Exception {
         List<Author> authors;
         authors = authService.getAllAuthors();
         request.setAttribute("authors", authors);

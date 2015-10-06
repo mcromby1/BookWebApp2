@@ -2,6 +2,7 @@ package edu.wctc.mrc.bookwebapp2.model;
 
 import java.sql.SQLException;
 import java.util.*;
+import javax.sql.DataSource;
 
 /**
  *
@@ -9,12 +10,21 @@ import java.util.*;
  */
 public class AuthorDAO implements AuthorDAOPlan {
 
-    private final DBAccessorPlan dataBase;
-    private final String driverClass;
-    private final String url;
-    private final String userName;
-    private final String password;
+    private DBAccessorPlan dataBase;
+    private String driverClass;
+    private String url;
+    private String userName;
+    private String password;
+    private DataSource dataSource;
 
+    /**
+     *
+     * @param db
+     * @param driverClass
+     * @param url
+     * @param userName
+     * @param password
+     */
     public AuthorDAO(DBAccessorPlan db, String driverClass, String url, String userName, String password) {
         this.dataBase = db;
         this.driverClass = driverClass;
@@ -23,9 +33,27 @@ public class AuthorDAO implements AuthorDAOPlan {
         this.password = password;
     }
 
+    public AuthorDAO(DBAccessorPlan db, DataSource ds) {
+        this.dataBase = db;
+        this.dataSource = ds;
+    }
+
+    private void whatConnectionType() throws ClassNotFoundException, SQLException, Exception {
+        if (dataSource == null) {
+            dataBase.openConnection(driverClass, url, userName, password);
+        } else if (dataSource != null) {
+            dataBase.openConnection(dataSource);
+        }
+    }
+
+    /**
+     *
+     * @return @throws SQLException
+     * @throws ClassNotFoundException
+     */
     @Override
-    public List<Author> findAllAuthors() throws SQLException, ClassNotFoundException {
-        dataBase.openConnection(driverClass, url, userName, password);
+    public List<Author> findAllAuthors() throws SQLException, ClassNotFoundException, Exception {
+        whatConnectionType();
         List<Map<String, Object>> results;
         List<Author> authors = new ArrayList<>();
 
@@ -46,17 +74,31 @@ public class AuthorDAO implements AuthorDAOPlan {
         return authors;
     }
 
+    /**
+     *
+     * @param pk
+     * @return
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
     @Override
-    public int deleteAuthor(int pk) throws SQLException, ClassNotFoundException {
-        dataBase.openConnection(driverClass, url, userName, password);
+    public int deleteAuthor(int pk) throws SQLException, ClassNotFoundException, Exception {
+        whatConnectionType();
         int recordDeleted = dataBase.deleteByPKPS("author", "author_id", pk);
         dataBase.closeConnection();
         return recordDeleted;
     }
 
+    /**
+     *
+     * @param columns
+     * @param values
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
     @Override
-    public void createNewAuthor(List columns, List values) throws SQLException, ClassNotFoundException {
-        dataBase.openConnection(driverClass, url, userName, password);
+    public void createNewAuthor(List columns, List values) throws SQLException, ClassNotFoundException, Exception {
+        whatConnectionType();
 
         dataBase.insertRecord("author", columns, values);
         dataBase.closeConnection();
@@ -64,15 +106,22 @@ public class AuthorDAO implements AuthorDAOPlan {
     }
 
     @Override
-    public void updateAuthor(List columns, List values) throws SQLException, ClassNotFoundException {
-        dataBase.openConnection(driverClass, url, userName, password);
+    public void updateAuthor(List columns, List values) throws SQLException, ClassNotFoundException, Exception {
+        whatConnectionType();
         dataBase.updateRecord(userName, userName, userName, values, userName);
         dataBase.closeConnection();
     }
 
+    /**
+     *
+     * @param pk
+     * @return
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
     @Override
-    public Author authorByPK(String pk) throws SQLException, ClassNotFoundException {
-        dataBase.openConnection(driverClass, url, userName, password);
+    public Author authorByPK(String pk) throws SQLException, ClassNotFoundException, Exception {
+        whatConnectionType();
         Map<String, Object> record
                 = dataBase.findRecordByPK("author", "author_id", pk);
 
@@ -89,9 +138,18 @@ public class AuthorDAO implements AuthorDAOPlan {
         return author;
     }
 
+    /**
+     *
+     * @param columnName
+     * @param whereColName
+     * @param colValue
+     * @param whereValue
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
     @Override
-    public void updateAuthor(String columnName, String whereColName, Object colValue, Object whereValue) throws SQLException, ClassNotFoundException {
-        dataBase.openConnection(driverClass, url, userName, password);
+    public void updateAuthor(String columnName, String whereColName, Object colValue, Object whereValue) throws SQLException, ClassNotFoundException, Exception {
+        whatConnectionType();
         dataBase.updateRecord("author", columnName, whereColName, colValue, whereValue);
     }
 

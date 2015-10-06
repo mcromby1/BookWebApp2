@@ -14,16 +14,16 @@ import java.util.List;
  */
 public interface AuthorDAOPlan {
 
-    public int deleteAuthor(int pk) throws SQLException, ClassNotFoundException;
+    public int deleteAuthor(int pk) throws SQLException, ClassNotFoundException, Exception;
 
-    public List<Author> findAllAuthors() throws SQLException, ClassNotFoundException;
+    public List<Author> findAllAuthors() throws SQLException, ClassNotFoundException, Exception;
 
-    public void createNewAuthor(List columns, List values) throws SQLException, ClassNotFoundException;
+    public void createNewAuthor(List columns, List values) throws SQLException, ClassNotFoundException, Exception;
 
-    public void updateAuthor(List columns, List values) throws SQLException, ClassNotFoundException;
+    public void updateAuthor(List columns, List values) throws SQLException, ClassNotFoundException, Exception;
 
-    public Author authorByPK(String pk) throws SQLException, ClassNotFoundException;
+    public Author authorByPK(String pk) throws SQLException, ClassNotFoundException, Exception;
 
-    public void updateAuthor(String columnName, String whereColName, Object colValue, Object whereValue) throws SQLException, ClassNotFoundException;
+    public void updateAuthor(String columnName, String whereColName, Object colValue, Object whereValue) throws SQLException, ClassNotFoundException, Exception;
 
 }
