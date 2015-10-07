@@ -10,7 +10,7 @@ import javax.sql.DataSource;
  */
 public class AuthorDAO implements AuthorDAOPlan {
 
-    private DBAccessorPlan dataBase;
+    private final DBAccessorPlan dataBase;
     private String driverClass;
     private String url;
     private String userName;
@@ -33,11 +33,22 @@ public class AuthorDAO implements AuthorDAOPlan {
         this.password = password;
     }
 
+    /**
+     *
+     * @param db
+     * @param ds
+     */
     public AuthorDAO(DBAccessorPlan db, DataSource ds) {
         this.dataBase = db;
         this.dataSource = ds;
     }
 
+    /**
+     *
+     * @throws ClassNotFoundException
+     * @throws SQLException
+     * @throws Exception
+     */
     private void whatConnectionType() throws ClassNotFoundException, SQLException, Exception {
         if (dataSource == null) {
             dataBase.openConnection(driverClass, url, userName, password);
@@ -50,6 +61,7 @@ public class AuthorDAO implements AuthorDAOPlan {
      *
      * @return @throws SQLException
      * @throws ClassNotFoundException
+     * @throws Exception
      */
     @Override
     public List<Author> findAllAuthors() throws SQLException, ClassNotFoundException, Exception {
@@ -65,8 +77,8 @@ public class AuthorDAO implements AuthorDAOPlan {
             author.setAuthorId(Integer.parseInt(obj.toString()));
             String name = a.get("author_name") == null ? "" : a.get("author_name").toString();
             author.setAuthorName(name);
-            obj = a.get("date_added");
-            Date dateAdded = (obj == null) ? new Date() : (Date) a.get("date_added");
+            obj = a.get("date_created");
+            Date dateAdded = (obj == null) ? new Date() : (Date) a.get("date_created");
             author.setDateCreated(dateAdded);
             authors.add(author);
         }
@@ -105,6 +117,14 @@ public class AuthorDAO implements AuthorDAOPlan {
 
     }
 
+    /**
+     *
+     * @param columns
+     * @param values
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     * @throws Exception
+     */
     @Override
     public void updateAuthor(List columns, List values) throws SQLException, ClassNotFoundException, Exception {
         whatConnectionType();

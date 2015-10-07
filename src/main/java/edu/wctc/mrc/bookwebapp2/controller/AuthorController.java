@@ -11,6 +11,7 @@ import java.util.List;
 import javax.sql.DataSource;
 import javax.naming.Context;
 import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -37,6 +38,7 @@ public class AuthorController extends HttpServlet {
     private static final String DELETE_ACTION = "delete";
     private static final String ACTION_PARAM = "action";
     private static final String MODIFY_ACTION = "modify";
+    private AuthorService authService;
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -50,122 +52,109 @@ public class AuthorController extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-
+        String destination = LIST_PAGE;
+        String action = request.getParameter(ACTION_PARAM);
         try {
-            String destination = LIST_PAGE;
-            String action = request.getParameter(ACTION_PARAM);
-            String dbClassName = this.getServletContext().getInitParameter("DBAccessorPlan");
-            Class c = Class.forName(dbClassName);
-            DBAccessorPlan db = (DBAccessorPlan) c.newInstance();
-            AuthorService authService = null;
+            String pk = null;
+            String authorName = null;
+            String createDate = null;
+            switch (action) {
+                case LIST_ACTION:
+                    refreshList(request, authService);
+                    destination = LIST_PAGE;
+                    break;
+                case ADD_ACTION:
+                    destination = MOD_CREATE_PAGE;
+                    break;
+                case UPDATE_ACTION:
+                    pk = request.getParameter("authorId");
+                    authorName = request.getParameter("authorName");
+                    createDate = request.getParameter("dateCreated");
 
-            String dataSourceParam = this.getServletContext().getInitParameter("dataSource");
-            try {
-                if (!(dataSourceParam.isEmpty())) {
-                    Context ctx = new InitialContext();
-                    DataSource ds = (DataSource) ctx.lookup(dataSourceParam);
-                    AuthorDAOPlan authDao = new AuthorDAO(new MySQLDb(), ds);
-                    authService = new AuthorService(authDao);
-                } else {
-
-                    String dbDriver = this.getServletContext().getInitParameter("dbDriver");
-                    String dbURL = this.getServletContext().getInitParameter("dbURL");
-                    String dbUserName = this.getServletContext().getInitParameter("dbUserName");
-                    String dbPassword = this.getServletContext().getInitParameter("dbPassword");
-
-                    /*
-                     For now we are hard-coding the strategy objects into this
-                     controller. In the future we'll auto inject them from a config
-                     file. Also, the DAO opens/closes a connection on each method call,
-                     which is not very efficient. In the future we'll learn how to use
-                     a connection pool to improve this.
-                     */
-//        DBAccessorPlan db = new MySQLDb();
-                    AuthorDAO authDao = new AuthorDAO(db, dbDriver, dbURL, dbUserName, dbPassword);
-                    authService = new AuthorService(authDao);
-                }
-
-                /*
-                 Here's what the connection pool version looks like.
-                 */
-
-                /*
-                 Determine what action to take based on a passed in QueryString
-                 Parameter
-                 */
-                String pk = null;
-                String authorName = null;
-                String createDate = null;
-                switch (action) {
-                    case LIST_ACTION:
-                        refreshList(request, authService);
-                        destination = LIST_PAGE;
-                        break;
-                    case ADD_ACTION:
-                        destination = MOD_CREATE_PAGE;
-                        break;
-                    case UPDATE_ACTION:
-                        pk = request.getParameter("authorId");
-                        authorName = request.getParameter("authorName");
-                        createDate = request.getParameter("dateCreated");
-
-                        if (!(authorName.isEmpty())) {
-                            authService.updateAuthor("author_name", "author_id", authorName, pk);
-                        }
-                        if (!(createDate.isEmpty())) {
-                            authService.updateAuthor("date_created", "author_id", createDate, pk);
-                        }
-                        refreshList(request, authService);
-                        destination = LIST_PAGE;
-                        break;
-                    case DELETE_ACTION:
-                        pk = request.getParameter("authorId");
-                        authService.deleteAuthor(Integer.parseInt(pk));
-                        refreshList(request, authService);
-                        destination = LIST_PAGE;
-                        break;
-                    case CREATE_ACTION:
-                        authorName = request.getParameter("authorName");
-                        createDate = request.getParameter("dateCreated");
-
-                        List<String> columns = new ArrayList<>();
-                        List<String> colValues = new ArrayList<>();
+                    if (!(authorName.isEmpty())) {
+                        authService.updateAuthor("author_name", "author_id", authorName, pk);
+                    }
+                    if (!(createDate.isEmpty())) {
+                        authService.updateAuthor("date_created", "author_id", createDate, pk);
+                    }
+                    refreshList(request, authService);
+                    destination = LIST_PAGE;
+                    break;
+                case DELETE_ACTION:
+                    pk = request.getParameter("authorId");
+                    authService.deleteAuthor(Integer.parseInt(pk));
+                    refreshList(request, authService);
+                    destination = LIST_PAGE;
+                    break;
+                case CREATE_ACTION:
+                    authorName = request.getParameter("authorName");
+                    createDate = request.getParameter("dateCreated");
+                    List<String> columns = new ArrayList<>();
+                    List<String> colValues = new ArrayList<>();
+                    if (!(authorName.isEmpty())) {
                         columns.add("author_name");
                         colValues.add(authorName);
+                    }
+                    if (!(createDate.isEmpty())) {
                         columns.add("date_created");
                         colValues.add(createDate);
-
-                        authService.addAuthor(columns, colValues);
-
-                        refreshList(request, authService);
-                        destination = LIST_PAGE;
-                        break;
-                    case MODIFY_ACTION:
-                        pk = request.getParameter("authorId");
-                        Author modAuthor = authService.searchAuthorByID(pk);
-
-                        request.setAttribute("author", modAuthor);
-                        destination = MOD_CREATE_PAGE;
-                        break;
-
-                    default:
-                        // no param identified in request, must be an error
-                        request.setAttribute("errMsg", NO_PARAM_ERR_MSG);
-                        destination = LIST_PAGE;
-                        break;
-                }
-            } catch (SQLException | ClassNotFoundException | NumberFormatException e) {
-                request.setAttribute("errMsg", e.getCause().getMessage());
-            } catch (Exception e) {
-                request.setAttribute("errMsg", e.getCause().getMessage());
+                    }
+                    authService.addAuthor(columns, colValues);
+                    refreshList(request, authService);
+                    destination = LIST_PAGE;
+                    break;
+                case MODIFY_ACTION:
+                    pk = request.getParameter("authorId");
+                    Author modAuthor = authService.searchAuthorByID(pk);
+                    request.setAttribute("author", modAuthor);
+                    destination = MOD_CREATE_PAGE;
+                    break;
+                default:
+                    // no param identified in request, must be an error
+                    request.setAttribute("errMsg", NO_PARAM_ERR_MSG);
+                    destination = LIST_PAGE;
+                    break;
             }
-            // Forward to destination page
-            RequestDispatcher dispatcher
-                    = getServletContext().getRequestDispatcher(destination);
-            dispatcher.forward(request, response);
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+        } catch (SQLException | ClassNotFoundException | NumberFormatException e) {
+            request.setAttribute("errMsg", e.getCause().getMessage());
+        } catch (Exception e) {
+            request.setAttribute("errMsg", e.getCause().getMessage());
+        }
+        RequestDispatcher dispatcher
+                = getServletContext().getRequestDispatcher(destination);
+        dispatcher.forward(request, response);
+    }
+
+    @Override
+    public void init() throws ServletException {
+        super.init();
+        try {
+            initParams();
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | NamingException e) {
 
         }
+    }
+
+    private void initParams() throws ClassNotFoundException, InstantiationException, IllegalAccessException, NamingException {
+        String dbClassName = this.getServletContext().getInitParameter("DBAccessorPlan");
+        Class c = Class.forName(dbClassName);
+        DBAccessorPlan db = (DBAccessorPlan) c.newInstance();
+        authService = null;
+        String dataSourceParam = this.getServletContext().getInitParameter("dataSource");
+        if (!(dataSourceParam.isEmpty())) {
+            Context ctx = new InitialContext();
+            DataSource ds = (DataSource) ctx.lookup(dataSourceParam);
+            AuthorDAOPlan authDao = new AuthorDAO(new MySQLDb(), ds);
+            authService = new AuthorService(authDao);
+        } else {
+            String dbDriver = this.getServletContext().getInitParameter("dbDriver");
+            String dbURL = this.getServletContext().getInitParameter("dbURL");
+            String dbUserName = this.getServletContext().getInitParameter("dbUserName");
+            String dbPassword = this.getServletContext().getInitParameter("dbPassword");
+            AuthorDAO authDao = new AuthorDAO(db, dbDriver, dbURL, dbUserName, dbPassword);
+            authService = new AuthorService(authDao);
+        }
+
     }
 
     private void refreshList(HttpServletRequest request, AuthorService authService) throws SQLException, ClassNotFoundException, Exception {
