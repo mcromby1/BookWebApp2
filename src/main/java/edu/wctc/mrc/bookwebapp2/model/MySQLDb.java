@@ -36,8 +36,8 @@ public class MySQLDb implements DBAccessorPlan {
         conn = DriverManager.getConnection(url, userName, password);
     }
 
-    public void openConnection(DataSource ds) throws Exception {
-        conn = ds.getConnection();
+    public void openConnection(DataSource datasource) throws Exception {
+        conn = datasource.getConnection();
     }
 
     /**
@@ -122,18 +122,18 @@ public class MySQLDb implements DBAccessorPlan {
     /**
      *
      * @param tableName
-     * @param columnName
+     * @param setColumnName
      * @param whereColName
-     * @param colValue
+     * @param setColValue
      * @param whereValue
      * @return
      * @throws SQLException
      */
     @Override
-    public int updateRecord(String tableName, String columnName, String whereColName, Object colValue, Object whereValue) throws SQLException {
-        PreparedStatement pstmt = createUpdateStatement(tableName, columnName, whereColName);
+    public int updateRecord(String tableName, String setColumnName, String whereColName, Object setColValue, Object whereValue) throws SQLException {
+        PreparedStatement pstmt = createUpdateStatement(tableName, setColumnName, whereColName);
 
-        pstmt.setObject(1, colValue);
+        pstmt.setObject(1, setColValue);
         pstmt.setObject(2, whereValue);
 
         System.out.println(pstmt.toString());
