@@ -1,17 +1,15 @@
 package edu.wctc.mrc.bookwebapp2.controller;
 
-import edu.wctc.mrc.bookwebapp2.model.Author;
-import edu.wctc.mrc.bookwebapp2.model.*;
-import edu.wctc.mrc.bookwebapp2.model.AuthorService;
-import edu.wctc.mrc.bookwebapp2.model.DBAccessorPlan;
+import edu.wctc.mrc.bookwebapp2.entity.*;
+import edu.wctc.mrc.bookwebapp2.service.*;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import javax.sql.DataSource;
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
+import javax.inject.Inject;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -22,7 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * The main controller for author-related activities
  *
- * @author jlombardo
+ * @author Matthew Cromby
  */
 @WebServlet(name = "AuthorController", urlPatterns = {"/AuthorController"})
 public class AuthorController extends HttpServlet {
@@ -38,7 +36,9 @@ public class AuthorController extends HttpServlet {
     private static final String DELETE_ACTION = "delete";
     private static final String ACTION_PARAM = "action";
     private static final String MODIFY_ACTION = "modify";
-    private AuthorService authService;
+
+    @Inject
+    private AuthorFacade authService;
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -58,6 +58,8 @@ public class AuthorController extends HttpServlet {
             String pk = null;
             String authorName = null;
             String createDate = null;
+            Author author = null;
+            DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
             switch (action) {
                 case LIST_ACTION:
                     refreshList(request, authService);
@@ -68,44 +70,50 @@ public class AuthorController extends HttpServlet {
                     break;
                 case UPDATE_ACTION:
                     pk = request.getParameter("authorId");
+                    author = authService.find(new Integer(pk));
                     authorName = request.getParameter("authorName");
                     createDate = request.getParameter("dateCreated");
 
                     if (!(authorName.isEmpty())) {
-                        authService.updateAuthor("author_name", "author_id", authorName, pk);
+                        author.setAuthorName(authorName);
                     }
                     if (!(createDate.isEmpty())) {
-                        authService.updateAuthor("date_created", "author_id", createDate, pk);
+                        Date newDate = format.parse(createDate);
+                        author.setDateCreated(newDate);
                     }
+                    authService.edit(author);
                     refreshList(request, authService);
                     destination = LIST_PAGE;
                     break;
                 case DELETE_ACTION:
                     pk = request.getParameter("authorId");
-                    authService.deleteAuthor(Integer.parseInt(pk));
+                    author = authService.find(new Integer(pk));
+                    authService.remove(author);
                     refreshList(request, authService);
                     destination = LIST_PAGE;
                     break;
                 case CREATE_ACTION:
                     authorName = request.getParameter("authorName");
                     createDate = request.getParameter("dateCreated");
-                    List<String> columns = new ArrayList<>();
-                    List<String> colValues = new ArrayList<>();
+                    author.setAuthorId(0);
                     if (!(authorName.isEmpty())) {
-                        columns.add("author_name");
-                        colValues.add(authorName);
+                        author.setAuthorName(authorName);
                     }
                     if (!(createDate.isEmpty())) {
-                        columns.add("date_created");
-                        colValues.add(createDate);
+                        Date newDate = format.parse(createDate);
+                        author.setDateCreated(newDate);
+                    } else {
+                        Date newDate = new Date();
+                        author.setDateCreated(newDate);
                     }
-                    authService.addAuthor(columns, colValues);
+                    authService.create(author);
                     refreshList(request, authService);
                     destination = LIST_PAGE;
                     break;
                 case MODIFY_ACTION:
                     pk = request.getParameter("authorId");
-                    Author modAuthor = authService.searchAuthorByID(pk);
+                    author.setAuthorId(new Integer(pk));
+                    Author modAuthor = authService.find(author);
                     request.setAttribute("author", modAuthor);
                     destination = MOD_CREATE_PAGE;
                     break;
@@ -115,7 +123,7 @@ public class AuthorController extends HttpServlet {
                     destination = LIST_PAGE;
                     break;
             }
-        } catch (SQLException | ClassNotFoundException | NumberFormatException e) {
+        } catch (NumberFormatException e) {
             request.setAttribute("errMsg", e.getCause().getMessage());
         } catch (Exception e) {
             request.setAttribute("errMsg", e.getCause().getMessage());
@@ -128,38 +136,11 @@ public class AuthorController extends HttpServlet {
     @Override
     public void init() throws ServletException {
         super.init();
-        try {
-            initParams();
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | NamingException e) {
-
-        }
-    }
-
-    private void initParams() throws ClassNotFoundException, InstantiationException, IllegalAccessException, NamingException {
-        String dbClassName = this.getServletContext().getInitParameter("DBAccessorPlan");
-        Class c = Class.forName(dbClassName);
-        DBAccessorPlan db = (DBAccessorPlan) c.newInstance();
-        authService = null;
-        String dataSourceParam = this.getServletContext().getInitParameter("dataSource");
-        if (!(dataSourceParam.isEmpty())) {
-            Context ctx = new InitialContext();
-            DataSource ds = (DataSource) ctx.lookup(dataSourceParam);
-            AuthorDAOPlan authDao = new AuthorDAO(new MySQLDb(), ds);
-            authService = new AuthorService(authDao);
-        } else {
-            String dbDriver = this.getServletContext().getInitParameter("dbDriver");
-            String dbURL = this.getServletContext().getInitParameter("dbURL");
-            String dbUserName = this.getServletContext().getInitParameter("dbUserName");
-            String dbPassword = this.getServletContext().getInitParameter("dbPassword");
-            AuthorDAO authDao = new AuthorDAO(db, dbDriver, dbURL, dbUserName, dbPassword);
-            authService = new AuthorService(authDao);
-        }
 
     }
 
-    private void refreshList(HttpServletRequest request, AuthorService authService) throws SQLException, ClassNotFoundException, Exception {
-        List<Author> authors;
-        authors = authService.getAllAuthors();
+    private void refreshList(HttpServletRequest request, AuthorFacade authService) throws SQLException, ClassNotFoundException, Exception {
+        List<Author> authors = authService.findAll();
         request.setAttribute("authors", authors);
     }
 
