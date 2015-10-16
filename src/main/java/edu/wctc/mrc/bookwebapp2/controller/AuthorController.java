@@ -6,9 +6,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import javax.inject.Inject;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -95,7 +93,7 @@ public class AuthorController extends HttpServlet {
                 case CREATE_ACTION:
                     authorName = request.getParameter("authorName");
                     createDate = request.getParameter("dateCreated");
-                    author.setAuthorId(0);
+                    author = new Author(0);
                     if (!(authorName.isEmpty())) {
                         author.setAuthorName(authorName);
                     }
@@ -112,8 +110,8 @@ public class AuthorController extends HttpServlet {
                     break;
                 case MODIFY_ACTION:
                     pk = request.getParameter("authorId");
-                    author.setAuthorId(new Integer(pk));
-                    Author modAuthor = authService.find(author);
+
+                    Author modAuthor = authService.find(new Integer(pk));
                     request.setAttribute("author", modAuthor);
                     destination = MOD_CREATE_PAGE;
                     break;
