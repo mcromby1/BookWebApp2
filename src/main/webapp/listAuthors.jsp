@@ -26,6 +26,7 @@
                 <th align="left" class="tableHead">ID</th>
                 <th align="left" class="tableHead">Author Name</th>
                 <th align="right" class="tableHead">Date Added</th>
+                <th align="left" class="tableHead">Books</th>
             </tr>
             <c:forEach var="a" items="${authors}" varStatus="rowCount">
                 <c:choose>

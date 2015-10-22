@@ -23,7 +23,6 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet(name = "AuthorController", urlPatterns = {"/AuthorController"})
 public class AuthorController extends HttpServlet {
 
-    // NO MAGIC NUMBERS!
     private static final String NO_PARAM_ERR_MSG = "No request parameter identified";
     private static final String LIST_PAGE = "/listAuthors.jsp";
     private static final String MOD_CREATE_PAGE = "/modifycreate.jsp";
@@ -49,7 +48,9 @@ public class AuthorController extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
         response.setContentType("text/html;charset=UTF-8");
+
         String destination = LIST_PAGE;
         String action = request.getParameter(ACTION_PARAM);
         try {

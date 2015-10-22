@@ -14,11 +14,11 @@
         <link href="css/bootstrap.css" rel="stylesheet" type="text/css"/>
         <title>Update or Add Author</title>
     </head>
-    <body>
+    <body class="col-xs-offset-1">
         <h1>Update/Add Author</h1>
         <div class="row">
+            <div class="panel panel-default  col-md-4 col-sm-4 col-xs-6">
 
-            <div class="panel panel-default col-md-4 col-sm-4 col-xs-6">
                 <div class="panel-heading"><h1>Author Form</h1></div>
                 <div class="panel-body">
                     <table>
@@ -35,25 +35,38 @@
                                 <td align="left"><input type="text" value="" name="authorName" placeholder="${author.authorName}"/></td>
                             </div>
                             </tr>
+                            <c:choose>
+                                <c:when test="${not empty author.bookCollection}">
+                                    <tr>
+                                    <select id="bookSetDropDown" name="bookId">
+                                        <c:forEach var="book" items="${author.bookCollection}" varStatus="rowCount">
+                                            <option value="${book.bookId}">${book.title}</option>
+                                        </c:forEach>
+                                    </select>
+                                    </tr>
+                                </c:when>
+                            </c:choose>
                             <tr>
                             <div class="form-group">
                                 <td><label for="dateCreated">Author Added Date</label></td>
                                 <td><input class="form-control" type="text" id="dateCreated" name="dateCreated" value="" placeholder="${author.dateCreated}"/></td>
                             </div>
                             </tr>
-                            <c:choose>
-                                <c:when test="${not empty author}">
-                                    <button class="btn-default" type="submit" id="create" name="action" value="update">Submit</button>
+                            <tr>
+                                <c:choose>
+                                    <c:when test="${not empty author}">
+                                    <button class="btn btn-default" type="submit" id="create" name="action" value="update">Submit</button>
                                 </c:when>
                                 <c:otherwise>
-                                    <button class="btn-default" type="submit" id="submit" name="action" value="create">Submit</button>
+                                    <button class="btn btn-default" type="submit" id="submit" name="action" value="create">Submit</button>
                                 </c:otherwise>
                             </c:choose>
+                            </tr>
                         </form>
                     </table>    
                 </div>
             </div>
         </div>
-        <a class="btn btn-success" role="button" href="AuthorController?action=list">Back to List</a>
+        <a class="btn btn-success" role="button" href="AuthorController?action=list">Back to List</a>       
     </body>
 </html>

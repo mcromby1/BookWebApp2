@@ -1,6 +1,6 @@
 package edu.wctc.mrc.bookwebapp2.service;
 
-import edu.wctc.mrc.bookwebapp2.entity.Author;
+import edu.wctc.mrc.bookwebapp2.entity.Book;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -10,8 +10,7 @@ import javax.persistence.PersistenceContext;
  * @author user test
  */
 @Stateless
-public class AuthorFacade extends AbstractFacade<Author> {
-
+public class BookFacade extends AbstractFacade<Book> {
     @PersistenceContext(unitName = "book_PU")
     private EntityManager em;
 
@@ -20,8 +19,8 @@ public class AuthorFacade extends AbstractFacade<Author> {
         return em;
     }
 
-    public AuthorFacade() {
-        super(Author.class);
+    public BookFacade() {
+        super(Book.class);
     }
-
+    
 }
