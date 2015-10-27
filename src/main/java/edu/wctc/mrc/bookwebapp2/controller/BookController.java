@@ -1,6 +1,7 @@
 package edu.wctc.mrc.bookwebapp2.controller;
 
 import edu.wctc.mrc.bookwebapp2.entity.Author;
+import edu.wctc.mrc.bookwebapp2.entity.Book;
 import edu.wctc.mrc.bookwebapp2.service.AuthorFacade;
 import edu.wctc.mrc.bookwebapp2.service.BookFacade;
 import java.util.*;
@@ -20,8 +21,9 @@ import javax.servlet.http.HttpServletResponse;
 public class BookController extends HttpServlet {
 
     private static final String NO_PARAM_ERR_MSG = "No request parameter identified";
-    private static final String LIST_PAGE = "/listAuthors.jsp";
-    private static final String MOD_CREATE_PAGE = "/modifycreate.jsp";
+    private static final String AUTHOR_LIST_PAGE = "/listAuthors.jsp";
+    private static final String BOOK_LIST_PAGE = "/listBooks.jsp";
+    private static final String BOOK_MOD_CREATE_PAGE = "/modifycreatebook.jsp";
     private static final String LIST_ACTION = "list";
     private static final String ADD_ACTION = "add";
     private static final String CREATE_ACTION = "create";
@@ -46,11 +48,40 @@ public class BookController extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
 
+        String destination = BOOK_LIST_PAGE;
+        String action = request.getParameter(ACTION_PARAM);
+
+        String bookId = null;
         String bookTitle = null;
         String bookISBN = null;
-        Author bookAuthor = null;
-        
-        
+        String authorId = null;
+        Book book = null;
+
+        switch (ACTION_PARAM) {
+            case LIST_ACTION:
+                refreshList(request, bookService);
+                destination = BOOK_LIST_PAGE;
+                break;
+            case ADD_ACTION:
+                destination = BOOK_MOD_CREATE_PAGE;
+                break;
+            case UPDATE_ACTION:
+                bookId = request.getParameter("bookID");
+                bookTitle = request.getParameter("bookTitle");
+                bookISBN = request.getParameter("bookISBN");
+                authorId = request.getParameter("authorId");
+
+                book = bookService.find(bookId);
+
+                break;
+            case CREATE_ACTION:
+
+                break;
+        }
+
+    }
+
+    private void refreshList(HttpServletRequest request, BookFacade bookService) {
 
     }
 
