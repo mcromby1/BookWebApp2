@@ -1,16 +1,17 @@
 package edu.wctc.mrc.bookwebapp2.controller;
 
 import edu.wctc.mrc.bookwebapp2.entity.Author;
-import edu.wctc.mrc.bookwebapp2.service.AuthorFacade;
-import edu.wctc.mrc.bookwebapp2.service.BookFacade;
-import java.util.*;
+import edu.wctc.mrc.bookwebapp2.service.AuthorService;
+import edu.wctc.mrc.bookwebapp2.service.BookService;
 import java.io.IOException;
-import javax.inject.Inject;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  *
@@ -30,9 +31,6 @@ public class BookController extends HttpServlet {
     private static final String ACTION_PARAM = "action";
     private static final String MODIFY_ACTION = "modify";
 
-    @Inject
-    private BookFacade bookService;
-
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -49,8 +47,12 @@ public class BookController extends HttpServlet {
         String bookTitle = null;
         String bookISBN = null;
         Author bookAuthor = null;
-        
-        
+
+        ServletContext sctx = getServletContext();
+        WebApplicationContext ctx
+                = WebApplicationContextUtils.getWebApplicationContext(sctx);
+        BookService bookService = (BookService) ctx.getBean("bookService");
+        AuthorService authService = (AuthorService) ctx.getBean("authorService");
 
     }
 

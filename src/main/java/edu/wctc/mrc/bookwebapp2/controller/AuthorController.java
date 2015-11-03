@@ -7,13 +7,15 @@ import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import javax.inject.Inject;
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * The main controller for author-related activities
@@ -34,9 +36,6 @@ public class AuthorController extends HttpServlet {
     private static final String ACTION_PARAM = "action";
     private static final String MODIFY_ACTION = "modify";
 
-    @Inject
-    private AuthorFacade authService;
-
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -53,6 +52,10 @@ public class AuthorController extends HttpServlet {
 
         String destination = LIST_PAGE;
         String action = request.getParameter(ACTION_PARAM);
+
+        ServletContext sctx = getServletContext();
+        WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(sctx);
+        AuthorService authService = (AuthorService) ctx.getBean("authorService");
         try {
             String pk = null;
             String authorName = null;
@@ -69,7 +72,7 @@ public class AuthorController extends HttpServlet {
                     break;
                 case UPDATE_ACTION:
                     pk = request.getParameter("authorId");
-                    author = authService.find(new Integer(pk));
+                    author = authService.findById(pk);
                     authorName = request.getParameter("authorName");
                     createDate = request.getParameter("dateCreated");
 
@@ -86,7 +89,7 @@ public class AuthorController extends HttpServlet {
                     break;
                 case DELETE_ACTION:
                     pk = request.getParameter("authorId");
-                    author = authService.find(new Integer(pk));
+                    author = authService.findById(pk);
                     authService.remove(author);
                     refreshList(request, authService);
                     destination = LIST_PAGE;
@@ -105,14 +108,14 @@ public class AuthorController extends HttpServlet {
                         Date newDate = new Date();
                         author.setDateCreated(newDate);
                     }
-                    authService.create(author);
+                    authService.edit(author);
                     refreshList(request, authService);
                     destination = LIST_PAGE;
                     break;
                 case MODIFY_ACTION:
                     pk = request.getParameter("authorId");
 
-                    Author modAuthor = authService.find(new Integer(pk));
+                    Author modAuthor = authService.findById(pk);
                     request.setAttribute("author", modAuthor);
                     destination = MOD_CREATE_PAGE;
                     break;
@@ -138,7 +141,7 @@ public class AuthorController extends HttpServlet {
 
     }
 
-    private void refreshList(HttpServletRequest request, AuthorFacade authService) throws SQLException, ClassNotFoundException, Exception {
+    private void refreshList(HttpServletRequest request, AuthorService authService) throws SQLException, ClassNotFoundException, Exception {
         List<Author> authors = authService.findAll();
         request.setAttribute("authors", authors);
     }
