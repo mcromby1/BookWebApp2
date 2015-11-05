@@ -10,7 +10,7 @@
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-
+<%@taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -19,8 +19,11 @@
         <title>Author List</title>
     </head>
     <body class="col-xs-offset-1 col-lg-5 col-md-5 col-sm-5 col-xs-6">
+        <sec:csrfInput />
         <h1>Author List</h1>
+        <sec:authorize access="hasAnyRole('ROLE_MGR')">
         <a class="btn btn-info" role="button" href="AuthorController?action=add">Add Author</a>
+        </sec:authorize>
         <table width="500" border="1" cellspacing="0" cellpadding="4">
             <tr style="background-color: black;color:white;">
                 <th align="left" class="tableHead">ID</th>
@@ -42,10 +45,12 @@
                     <td align="right">
                         <fmt:formatDate pattern="M/d/yyyy" value="${a.dateCreated}"></fmt:formatDate>
                         </td>
+                    <sec:authorize access="hasAnyRole('ROLE_MGR')">
                         <td>
                             <p><a class="btn btn-danger" role="button" href="AuthorController?action=delete&authorId=${a.authorId}">Delete</a> 
-                            <a class="btn btn-success" role="button" href="AuthorController?action=modify&authorId=${a.authorId}">Update</a>
-                    </td>
+                                <a class="btn btn-success" role="button" href="AuthorController?action=modify&authorId=${a.authorId}">Update</a>
+                        </td>
+                    </sec:authorize>
                 </tr>
             </c:forEach>
         </table>
