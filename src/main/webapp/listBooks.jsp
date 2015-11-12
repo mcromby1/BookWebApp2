@@ -9,13 +9,13 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link href="css/bootstrap.css" rel="stylesheet" type="text/css"/>
-        <title>Author List</title>
+        <title>Book List</title>
     </head>
     <body class="col-xs-offset-1 col-lg-5 col-md-5 col-sm-5 col-xs-6">
         <sec:csrfInput />
-        <h1>Author List</h1>
+        <h1>Book List</h1>
         <sec:authorize access="hasAnyRole('ROLE_MGR')">
-            <a class="btn btn-info" role="button" href="AuthorController?action=add">Add Author</a>
+        <a class="btn btn-info" role="button" href="bookController?action=add">Add Book</a>
         </sec:authorize>
         <table width="500" border="1" cellspacing="0" cellpadding="4">
             <tr style="background-color: black;color:white;">
@@ -23,9 +23,8 @@
                 <th align="left" class="tableHead">Author Name</th>
                 <th align="right" class="tableHead">Date Added</th>
                 <th align="left" class="tableHead">Books</th>
-                <th align="left" class="Tablehead">Actions</th>
             </tr>
-            <c:forEach var="a" items="${authors}" varStatus="rowCount">
+            <c:forEach var="b" items="${books}" varStatus="rowCount">
                 <c:choose>
                     <c:when test="${rowCount.count % 2 == 0}">
                         <tr style="background-color: white;">
@@ -34,25 +33,15 @@
                         <tr style="background-color: #ccffff;">
                         </c:otherwise>
                     </c:choose>
-                    <td align="left">${a.authorId}</td>
-                    <td align="left">${a.authorName}</td>
+                    <td align="left">${b.bookId}</td>
+                    <td align="left">${b.bookName}</td>
                     <td align="right">
                         <fmt:formatDate pattern="M/d/yyyy" value="${a.dateCreated}"></fmt:formatDate>
                         </td>
-                        <td align="center">
-                       <!--<button class="btn btn-default dropdown-toggle" 
-                                                   type="button" id="dropdownbutton" 
-                                                   data-toggle="dropdown" aria-haspopup="true" aria-expended="true">Books<span class="caret"></span></button>
-                            <ul class="dropdown-menu" aria-labeledby="dropdownbutton">
-                            <c:forEach var="b" items="a.bookSet.bookCollection.Book">
-                                <li>${b.title}</li>
-                                </c:forEach> 
-                        </ul>-->
-                    </td>
-                    <sec:authorize access="hasAnyRole('ROLE_MGR')"> 
+                    <sec:authorize access="hasAnyRole('ROLE_MGR')">
                         <td>
-                            <p><a class="btn btn-danger" role="button" href="AuthorController?action=delete&authorId=${a.authorId}">Delete</a>
-                                <a class="btn btn-success" role="button" href="AuthorController?action=modify&authorId=${a.authorId}">Update</a></p>
+                            <p><a class="btn btn-danger" role="button" href="BookController?action=delete&authorId=${b.bookId}">Delete</a> 
+                                <a class="btn btn-success" role="button" href="BookController?action=modify&authorId=${b.bookId}">Update</a>
                         </td>
                     </sec:authorize>
                 </tr>

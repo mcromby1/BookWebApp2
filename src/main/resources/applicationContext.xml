@@ -67,7 +67,7 @@
 	    password-parameter="j_password"
             login-processing-url="/j_spring_security_check"
             login-page="/login.jsp" 
-            default-target-url="/index.html"
+            default-target-url="/AuthorController?action=list"
             always-use-default-target="true"
             authentication-failure-url="/loginerror.jsp"/>
             
@@ -76,7 +76,7 @@
                     delete-cookies="JSESSIONID"
                     logout-success-url="/login.jsp" />
         
-        <sec:csrf disabled="false"/>
+        <sec:csrf disabled="true"/>
         <!-- end Spring Security Config -->
 
     </sec:http>

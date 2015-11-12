@@ -107,7 +107,7 @@ public class Author implements Serializable {
     }
 
     @XmlTransient
-    public Collection<Book> getBookCollection() {
+    public Set<Book> getBookCollection() {
         return bookCollection;
     }
 
