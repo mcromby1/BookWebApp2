@@ -2,11 +2,13 @@ package edu.wctc.mrc.bookwebapp2.controller;
 
 import edu.wctc.mrc.bookwebapp2.entity.*;
 import edu.wctc.mrc.bookwebapp2.service.*;
-import java.io.IOException;
+import java.io.*;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import javax.json.*;
+import javax.json.JsonArrayBuilder;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -35,6 +37,7 @@ public class AuthorController extends HttpServlet {
     private static final String DELETE_ACTION = "delete";
     private static final String ACTION_PARAM = "action";
     private static final String MODIFY_ACTION = "modify";
+    private static final String LIST_AJAX = "authorListAjax";
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -62,7 +65,25 @@ public class AuthorController extends HttpServlet {
             String createDate = null;
             Author author = null;
             DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+            PrintWriter out = response.getWriter();
             switch (action) {
+                case LIST_AJAX:
+                    List<Author> authors = authService.findAll();
+                    JsonArrayBuilder jsonAB = Json.createArrayBuilder();
+
+                    for (Author a : authors) {
+                        jsonAB.add(
+                                Json.createObjectBuilder()
+                                .add("authorId", a.getAuthorId())
+                                .add("authorName", a.getAuthorName())
+                                .add("dateAdded", a.getDateCreated().toString())
+                        );
+                    }
+                    JsonArray jsona = jsonAB.build();
+                    response.setContentType("application/json");
+                    out.write(jsona.toString());
+                    out.flush();
+                    return;
                 case LIST_ACTION:
                     refreshList(request, authService);
                     destination = LIST_PAGE;
